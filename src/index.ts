@@ -1,17 +1,14 @@
 import express from 'express';
+import authRouter from 'routes/auth';
+import 'src/db';
 
 const app = express();
 
-app.get('/', (req, res) => {
-	res.status(405).json({ message: 'Method not allowed' });
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-app.post('/', (req, res) => {
-	req.on('data', (chunk) => {
-		console.log(JSON.parse(chunk));
-		res.status(405).json({ message: 'This message is coming from post request' });
-	});
-});
+// API ROUTES
+app.use('/auth', authRouter);
 
 app.listen(8000, () => {
 	console.log('Example app listening on port 8000!');

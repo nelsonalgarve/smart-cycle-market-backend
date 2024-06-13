@@ -11,13 +11,18 @@
 	"author": "Nelson Guerreiro",
 	"license": "ISC",
 	"dependencies": {
+		"bcrypt": "^5.1.1",
 		"express": "^4.19.2",
+		"mongoose": "^8.4.1",
+		"nodemailer": "^6.9.13",
 		"ts-node-dev": "^2.0.0",
 		"tsc-alias": "^1.8.10",
 		"tsconfig-paths": "^4.2.0"
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^5.0.2",
 		"@types/express": "^4.17.21",
-		"@types/node": "^20.14.2"
+		"@types/node": "^20.14.2",
+		"@types/nodemailer": "^6.4.15"
 	}
 }
