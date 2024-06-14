@@ -19,7 +19,7 @@ const userSchema = new Schema<UserDocument, {}, Methods>(
 			unique: true,
 			lowercase: true,
 			trim: true,
-			match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+			// match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
 		},
 		name: {
 			type: String,

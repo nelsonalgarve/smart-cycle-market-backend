@@ -6,23 +6,18 @@ import nodemailer from 'nodemailer';
 import { sendErrorRes } from 'src/utils/helper';
 
 export const createNewUser: RequestHandler = async (req, res) => {
-	// 2. Validate if the data is ok or not
-	// 3. Send Error if not
-	// 4. Check if e already have an account with the same user
-	// 5. Send error if yes, otherwise create a new account and save user in DB
-	// 8. Send message back to check email
 	// 1. Read incomming data like: name, email, password
 	const { name, email, password } = req.body;
 
 	// 2. Validate if the data is ok or not
 	// 3. Send Error if not
-	if (!name) return sendErrorRes(res, 'Name is missing', 422);
-	if (!email) return res.status(422).send('Email is missing');
-	if (!password) return res.status(422).send('Password is missing');
+	// if (!name) return sendErrorRes(res, 'Name is missing fff', 422);
+	// if (!email) return sendErrorRes(res, 'Email is missing', 422);
+	// if (!password) return sendErrorRes(res, 'Password is missing', 422);
 
 	// 4. Check if we already have an account with the same user
 	const user1 = await UserModel.findOne({ email });
-	if (user1) return res.status(401).json({ message: 'User already exists' });
+	if (user1) return sendErrorRes(res, 'User already exists', 401);
 
 	// 5. Create a new account and save user in DB
 
