@@ -33,7 +33,7 @@ export const createNewUser: RequestHandler = async (req, res) => {
 	});
 
 	// 7. Send verification mail with token to registered email
-	const link = `http://localhost:8000/auth/?verify=${user._id}&token=${token}`;
+	const link = `http://localhost:8000/verify.html?id=${user._id}&token=${token}`;
 
 	// Send message back to check email
 
@@ -123,4 +123,8 @@ export const signIn: RequestHandler = async (req, res) => {
 			access: accessToken,
 		},
 	});
+};
+
+export const sendProfile: RequestHandler = (req, res) => {
+	res.json({ profile: { ...req.user } });
 };

@@ -5,6 +5,7 @@ import 'src/db';
 
 const app = express();
 
+app.use(express.static('src/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
