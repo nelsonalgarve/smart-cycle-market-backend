@@ -10,7 +10,7 @@ const validate = (schema: yup.Schema): RequestHandler => {
 		} catch (error) {
 			if (error instanceof yup.ValidationError) {
 				sendErrorRes(res, error.message, 422);
-				next();
+				// next();
 			} else {
 				next(error);
 			}
