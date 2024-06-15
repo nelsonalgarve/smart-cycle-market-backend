@@ -46,3 +46,18 @@ authRouter.post("/reset-pass");
 5. If not valid send error otherwise generate access & refresh token.
 6. Store refresh token in DB.
 7. Send both tokens to user.
+
+-   `verify-token`
+
+1. Check if user is authenticated or not
+2. Remove previous token if any
+3. Create/store new token and send response back
+
+-   `refresh-token`
+
+1. Read and verify refresh token
+2. Find user with payload.id and refresh token
+3. If the refresh token is valid nd no user found, token is compromised
+4. Remove all the previous tokens, and send error response
+5. If he token is valid and user found create new refresh and access token
+6. Remove previous token, update user and send new tokens
