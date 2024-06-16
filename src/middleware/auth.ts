@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import PasswordResetTokenModel from 'models/authVerificationToken';
+import PasswordResetTokenModel from 'models/passwordResetToken';
 import UserModel from 'src/models/user';
 import { sendErrorRes } from 'src/utils/helper';
 
@@ -53,17 +53,21 @@ export const isAuth: RequestHandler = async (req, res, next) => {
 
 export const isValidPassResetToken: RequestHandler = async (req, res, next) => {
 	/**
-1. Read token and id
-2. Find token inside database with owner id.
-3. If there is no token send error.
-4. Else compare token with encrypted value.
-5. If not matched send error.
-6. Else call next function.
-     **/
+  1. Read token and id
+  2. Find token inside database with owner id.
+  3. If there is no token send error.
+  4. Else compare token with encrypted value.
+  5. If not matched send error.
+  6. Else call next function.
+	   **/
 
 	const { id, token } = req.body;
+	console.log('token and id: ', id, 'token: ', token);
+
 	const resetPassToken = await PasswordResetTokenModel.findOne({ owner: id });
-	if (!resetPassToken) return sendErrorRes(res, 'Unauthorized request, invalid token!', 403);
+	console.log(resetPassToken);
+
+	if (!resetPassToken) return sendErrorRes(res, 'Unauthorized request, invalid token! fg', 403);
 
 	const matched = await resetPassToken.compareToken(token);
 	if (!matched) return sendErrorRes(res, 'Unauthorized request, invalid token!', 403);

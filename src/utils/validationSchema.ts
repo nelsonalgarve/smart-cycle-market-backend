@@ -11,17 +11,21 @@ yup.addMethod(yup.string, 'email', function validateEmail(message) {
 	});
 });
 
-export const newUserSchema = yup.object({
-	name: yup.string().required('Name is missing!'),
-	email: yup.string().email('Invalid email!').required('Email is missing!'),
+const password = {
 	password: yup
 		.string()
 		.min(8, 'Password must be at least 8 characters')
 		.required('Password is missing!')
 		.matches(passwordRegex, 'Password must contain at least one uppercase letter'),
+};
+
+export const newUserSchema = yup.object({
+	name: yup.string().required('Name is missing!'),
+	email: yup.string().email('Invalid email!').required('Email is missing!'),
+	...password,
 });
 
-export const verifyTokenSchema = yup.object({
+const tokenAndId = {
 	id: yup.string().test({
 		name: 'valid-id',
 		message: 'Invalid user Id!',
@@ -31,4 +35,13 @@ export const verifyTokenSchema = yup.object({
 	}),
 
 	token: yup.string().required('Token is missing!'),
+};
+
+export const verifyTokenSchema = yup.object({
+	...tokenAndId,
+});
+
+export const resetPassSchema = yup.object({
+	...tokenAndId,
+	...password,
 });

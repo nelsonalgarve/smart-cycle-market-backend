@@ -3,10 +3,12 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import AuthVerificationTokenModel from 'models/authVerificationToken';
 import UserModel from 'models/user';
+import PasswordResetTokenModel from 'src/models/passwordResetToken';
 import { sendErrorRes } from 'src/utils/helper';
 import mail from 'src/utils/mail';
 
 const { VERIFICATION_LINK } = process.env;
+const { PASSWORD_RESET_LINK } = process.env;
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export const createNewUser: RequestHandler = async (req, res) => {
@@ -179,3 +181,58 @@ export const signOut: RequestHandler = async (req, res) => {
 
 	res.send();
 };
+
+export const generateForgetPassLink: RequestHandler = async (req, res) => {
+	/*
+	1. Ask for user email *
+	2. Find user with the given email in dB *
+	3. Send error if no user *
+	4. Else generate password reset token (first remove if there is any)
+	5. Generate reset link (like we did for verification)
+	6. Send link inside user's email
+	7. Send response back
+	*/
+	const { email } = req.body;
+
+	const user = await UserModel.findOne({ email });
+	if (!user) return sendErrorRes(res, 'Account not found', 404);
+
+	// Remove token
+	await PasswordResetTokenModel.findOneAndDelete({ owner: user._id });
+
+	// Create new token
+	const token = crypto.randomBytes(36).toString('hex');
+	await PasswordResetTokenModel.create({ owner: user._id, token });
+
+	// Send the link to email
+	const passResetLink = `${PASSWORD_RESET_LINK}?id=${user._id}&token=${token}`;
+	await mail.sendPasswordResetLink(user.email, passResetLink);
+
+	// Send response
+
+	res.json({ message: 'Please check your email!', user });
+};
+
+export const grantValid: RequestHandler = (req, res) => {
+	res.json({ valid: true });
+};
+
+export const updatePassword: RequestHandler = async (req, res) => {
+	const { id, password } = req.body;
+	const user = await UserModel.findById(id);
+	if (!user) return sendErrorRes(res, 'Unauthorized access', 403);
+
+	const matched = await user.comparePassword(password);
+	if (matched) return sendErrorRes(res, 'The new password must be different!', 422);
+
+	user.password = password;
+	await user.save();
+
+	await PasswordResetTokenModel.findOneAndDelete({ owner: user._id });
+
+	mail.sendPasswordUpdateMessage(user.email);
+
+	res.json({ message: 'Password resets successfully.' });
+};
+
+export const updateProfile: RequestHandler = (req, res) => {};
