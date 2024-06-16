@@ -91,15 +91,25 @@ authRouter.post("/reset-pass");
 2. Validate all this things.
 3. If valid find user with the given id.
 4. Check if user is using same password.
-5. If there is no user or user is using the same password
-6. Else update new password
-7. Remove password reset token
-8. Send confirmation email
-9. Send response back
+5. If there is no user or user is using the same password.
+6. Else update new password.
+7. Remove password reset token.
+8. Send confirmation email.
+9. Send response back.
 
 -   `/update-profile`
 
-1. User must be logged (Authenticated)
-2. Name must be valid
-3. Find user and update the name
-4. Send the new profile back
+1. User must be logged. (Authenticated)
+2. Name must be valid.
+3. Find user and update the name.
+4. Send the new profile back.
+
+-   `/update-avatar`
+
+1. User must be logged in.
+2. Read incoming file.
+3. File type must be an image.
+4. Check if user have avatar or not.
+5. If yes, remove old avatar.
+6. Upload new avatar and update user.
+7. Send response back

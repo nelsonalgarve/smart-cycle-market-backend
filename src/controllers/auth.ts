@@ -258,3 +258,15 @@ export const updateProfile: RequestHandler = async (req, res) => {
 		},
 	});
 };
+
+export const updateAvatar: RequestHandler = async (req, res) => {
+	const { avatar } = req.files;
+
+	if (Array.isArray(avatar)) {
+		return sendErrorRes(res, 'Multiple files are not allowed', 422);
+	}
+
+	if (!avatar.mimetype?.startsWith('image')) {
+		return sendErrorRes(res, 'Invalid image file!', 422);
+	}
+};
