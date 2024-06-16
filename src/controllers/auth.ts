@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from 'cloudinary';
 import crypto from 'crypto';
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
@@ -10,6 +11,16 @@ import mail from 'src/utils/mail';
 const { VERIFICATION_LINK } = process.env;
 const { PASSWORD_RESET_LINK } = process.env;
 const JWT_SECRET = process.env.JWT_SECRET!;
+const CLOUD_NAME = process.env.CLOUD_NAME!;
+const CLOUD_KEY = process.env.CLOUD_KEY!;
+const CLOUD_SECRET = process.env.CLOUD_SECRET!;
+
+cloudinary.config({
+	cloud_name: CLOUD_NAME,
+	api_key: CLOUD_KEY,
+	api_secret: CLOUD_SECRET,
+	secure: true,
+});
 
 export const createNewUser: RequestHandler = async (req, res) => {
 	const { name, email, password } = req.body;
@@ -266,7 +277,25 @@ export const updateAvatar: RequestHandler = async (req, res) => {
 		return sendErrorRes(res, 'Multiple files are not allowed', 422);
 	}
 
-	if (!avatar.mimetype?.startsWith('image')) {
+	if (!avatar.mimetype!.startsWith('image')) {
 		return sendErrorRes(res, 'Invalid image file!', 422);
 	}
+
+	const user = await UserModel.findById(req.user.id);
+	if (!user) return sendErrorRes(res, 'User not found', 404);
+
+	if (user.avatar?.id) {
+		await cloudinary.uploader.destroy(user.avatar.id);
+	}
+
+	const { secure_url: url, public_id: id } = await cloudinary.uploader.upload(avatar.filepath);
+	user.avatar = { url, id };
+	await user.save();
+
+	res.json({
+		profile: {
+			...req.user,
+			avatar: user.avatar.url,
+		},
+	});
 };
