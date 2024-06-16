@@ -4,6 +4,7 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import AuthVerificationTokenModel from 'models/authVerificationToken';
 import UserModel from 'models/user';
+import { isValidObjectId } from 'mongoose';
 import PasswordResetTokenModel from 'src/models/passwordResetToken';
 import { sendErrorRes } from 'src/utils/helper';
 import mail from 'src/utils/mail';
@@ -288,7 +289,12 @@ export const updateAvatar: RequestHandler = async (req, res) => {
 		await cloudinary.uploader.destroy(user.avatar.id);
 	}
 
-	const { secure_url: url, public_id: id } = await cloudinary.uploader.upload(avatar.filepath);
+	const { secure_url: url, public_id: id } = await cloudinary.uploader.upload(avatar.filepath, {
+		width: 300,
+		height: 300,
+		crop: 'thumb',
+		gravity: 'face',
+	});
 	user.avatar = { url, id };
 	await user.save();
 
@@ -298,4 +304,15 @@ export const updateAvatar: RequestHandler = async (req, res) => {
 			avatar: user.avatar.url,
 		},
 	});
+};
+
+export const sendPublicProfile: RequestHandler = async (req, res) => {
+	const profileId = req.params.id;
+	if (!isValidObjectId(profileId)) {
+		return sendErrorRes(res, 'Invalid Profile id', 422);
+	}
+	const user = await UserModel.findById(profileId);
+	if (!user) return sendErrorRes(res, 'Profile not found', 404);
+
+	res.json({ profile: { id: user._id, name: user.name, avatar: user.avatar?.url } });
 };

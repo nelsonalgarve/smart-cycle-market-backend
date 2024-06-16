@@ -5,6 +5,7 @@ import {
 	grantAccessToken,
 	grantValid,
 	sendProfile,
+	sendPublicProfile,
 	signIn,
 	signOut,
 	updateAvatar,
@@ -32,5 +33,6 @@ authRouter.post('/verify-pass-reset-token', validate(verifyTokenSchema), isValid
 authRouter.post('/reset-pass', validate(resetPassSchema), isValidPassResetToken, updatePassword);
 authRouter.patch('/update-profile', isAuth, updateProfile);
 authRouter.patch('/update-avatar', isAuth, fileParser, updateAvatar);
+authRouter.get('/profile/:id', isAuth, sendPublicProfile);
 
 export default authRouter;
