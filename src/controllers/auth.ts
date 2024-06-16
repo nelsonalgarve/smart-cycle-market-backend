@@ -235,4 +235,26 @@ export const updatePassword: RequestHandler = async (req, res) => {
 	res.json({ message: 'Password resets successfully.' });
 };
 
-export const updateProfile: RequestHandler = (req, res) => {};
+export const updateProfile: RequestHandler = async (req, res) => {
+	const { name } = req.body;
+
+	if (typeof name !== 'string' || name.trim().length < 3) {
+		return sendErrorRes(res, 'Unauthorized access!', 403);
+	}
+
+	const user = await UserModel.findByIdAndUpdate(req.user.id, { name }, { new: true });
+	if (!user) return sendErrorRes(res, 'Unauthorized access!', 403);
+
+	res.json({
+		profile: {
+			id: user.id,
+			name: user.name,
+			email: user.email,
+			verified: user.verified,
+		},
+		test: {
+			...req.user,
+			name,
+		},
+	});
+};

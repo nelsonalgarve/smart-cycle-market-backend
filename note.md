@@ -96,3 +96,10 @@ authRouter.post("/reset-pass");
 7. Remove password reset token
 8. Send confirmation email
 9. Send response back
+
+-   `/update-profile`
+
+1. User must be logged (Authenticated)
+2. Name must be valid
+3. Find user and update the name
+4. Send the new profile back
