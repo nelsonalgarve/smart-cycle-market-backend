@@ -1,10 +1,10 @@
-import { v2 as cloudinary } from 'cloudinary';
 import crypto from 'crypto';
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import AuthVerificationTokenModel from 'models/authVerificationToken';
 import UserModel from 'models/user';
 import { isValidObjectId } from 'mongoose';
+import cloudUploader from 'src/cloud';
 import PasswordResetTokenModel from 'src/models/passwordResetToken';
 import { sendErrorRes } from 'src/utils/helper';
 import mail from 'src/utils/mail';
@@ -12,16 +12,6 @@ import mail from 'src/utils/mail';
 const { VERIFICATION_LINK } = process.env;
 const { PASSWORD_RESET_LINK } = process.env;
 const JWT_SECRET = process.env.JWT_SECRET!;
-const CLOUD_NAME = process.env.CLOUD_NAME!;
-const CLOUD_KEY = process.env.CLOUD_KEY!;
-const CLOUD_SECRET = process.env.CLOUD_SECRET!;
-
-cloudinary.config({
-	cloud_name: CLOUD_NAME,
-	api_key: CLOUD_KEY,
-	api_secret: CLOUD_SECRET,
-	secure: true,
-});
 
 export const createNewUser: RequestHandler = async (req, res) => {
 	const { name, email, password } = req.body;
@@ -286,10 +276,10 @@ export const updateAvatar: RequestHandler = async (req, res) => {
 	if (!user) return sendErrorRes(res, 'User not found', 404);
 
 	if (user.avatar?.id) {
-		await cloudinary.uploader.destroy(user.avatar.id);
+		await cloudUploader.destroy(user.avatar.id);
 	}
 
-	const { secure_url: url, public_id: id } = await cloudinary.uploader.upload(avatar.filepath, {
+	const { secure_url: url, public_id: id } = await cloudUploader.upload(avatar.filepath, {
 		width: 300,
 		height: 300,
 		crop: 'thumb',
