@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns';
 import { isValidObjectId } from 'mongoose';
 import * as yup from 'yup';
 import categories from './categories';
@@ -52,11 +53,20 @@ export const newProductSchema = yup.object({
 	description: yup.string().required('Description is missing!'),
 	category: yup.string().oneOf(categories, 'Invalid category!').required('Category is missing!'),
 	price: yup
-		.number()
+		.string()
 		.transform((value) => {
 			if (isNaN(+value)) return '';
 			return +value;
 		})
 		.required('Price is missing!'),
-	purchasingDate: yup.date().required('Purchasing date is missing!'),
+	purchasingDate: yup
+		.string()
+		.transform((value) => {
+			try {
+				return parseISO(value);
+			} catch (error) {
+				return '';
+			}
+		})
+		.required('Purchasing date is missing!'),
 });

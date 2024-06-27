@@ -7,6 +7,6 @@ import { newProductSchema } from 'src/utils/validationSchema';
 
 const productRouter = Router();
 
-productRouter.get('/list', isAuth, fileParser, validate(newProductSchema), listNewProduct);
+productRouter.post('/list', isAuth, fileParser, validate(newProductSchema), listNewProduct);
 
 export default productRouter;
