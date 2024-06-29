@@ -219,7 +219,7 @@ export const deleteProductImage: RequestHandler = async (req, res) => {
 
 export const getProductDetail: RequestHandler = async (req, res) => {
 	const productId = req.params.id;
-	if (!isValidObjectId(productId)) return sendErrorRes(res, 'Invalid product id!', 422);
+	if (!isValidObjectId(productId)) return sendErrorRes(res, 'Invalid product id!---', 422);
 	const product = await ProductModel.findById(productId).populate<{ owner: UserDocument }>('owner');
 	if (!product) return sendErrorRes(res, 'Product not found!', 404);
 
@@ -264,6 +264,8 @@ export const getProductsByCategory: RequestHandler = async (req, res) => {
 };
 
 export const getLatestProducts: RequestHandler = async (req, res) => {
+	console.log('Hello');
+
 	const products = await ProductModel.find().sort({ createdAt: -1 }).limit(10);
 
 	const listings = products.map((p) => {
@@ -279,4 +281,29 @@ export const getLatestProducts: RequestHandler = async (req, res) => {
 	res.json({ products: listings });
 };
 
-export const getListings: RequestHandler = async (req, res) => {};
+export const getListings: RequestHandler = async (req, res) => {
+	const { pageNo = '1', limit = '10' } = req.query as { pageNo: string; limit: string };
+	const { id } = req.user;
+	if (!isValidObjectId(id)) return sendErrorRes(res, 'Invalid user!', 422);
+	const products = await ProductModel.find({ owner: id })
+		.populate<{ owner: UserDocument }>('owner')
+		.sort({ createdAt: -1 })
+		.skip((+pageNo - 1) * +limit)
+		.limit(+limit);
+
+	const listings = products.map((p) => {
+		return {
+			id: p._id,
+			name: p.name,
+			thumbnail: p.thumbnail,
+			category: p.category,
+			price: p.price,
+			images: p.images?.map(({ url }) => url),
+			date: p.purchasingDate,
+			description: p.description,
+			seller: { id: p.owner._id, name: p.owner.name, avatar: p.owner.avatar?.url },
+		};
+	});
+
+	res.json({ products: listings });
+};

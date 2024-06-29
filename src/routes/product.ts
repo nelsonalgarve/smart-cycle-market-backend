@@ -20,9 +20,9 @@ productRouter.post('/list', isAuth, fileParser, validate(newProductSchema), list
 productRouter.patch('/:id', isAuth, fileParser, validate(newProductSchema), updateProduct);
 productRouter.delete('/:id', isAuth, deleteProduct);
 productRouter.delete('/image/:productId/:imageId', isAuth, deleteProductImage);
-productRouter.get('/:id', isAuth, getProductDetail);
+productRouter.get('/detail/:id', isAuth, getProductDetail);
 productRouter.get('/by-category/:category', getProductsByCategory);
-productRouter.get('/latest', getLatestProducts);
+productRouter.get('/latest', isAuth, getLatestProducts);
 productRouter.get('/listings', isAuth, getListings);
 
 export default productRouter;
