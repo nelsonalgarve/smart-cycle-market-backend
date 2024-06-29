@@ -23,7 +23,7 @@ const schema = new Schema<AuthVerificationTokenDocument, {}, Methods>({
 	},
 	createdAt: {
 		type: Date,
-		expires: 86400,
+		expires: 864000,
 		default: Date.now,
 	},
 });

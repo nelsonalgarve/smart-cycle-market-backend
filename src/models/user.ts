@@ -1,7 +1,7 @@
 import { compare, genSalt, hash } from 'bcrypt';
 import { Document, ObjectId, Schema, model } from 'mongoose';
 
-interface UserDocument extends Document {
+export interface UserDocument extends Document {
 	_id: ObjectId;
 	name: string;
 	email: string;
